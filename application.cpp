@@ -217,3 +217,6 @@ void Application::renderAddNewUserMenu()const{
         }
         delete user;
 }
+void Application::renderAddNewTripMenu()const{
+    
+}
