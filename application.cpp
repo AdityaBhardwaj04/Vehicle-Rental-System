@@ -321,4 +321,84 @@ void Appilcation::renderViewTripMenu()const{
     catch(Error e){
         this->showDialog(e.getMessage());
     }
+    delete modifiedTrip;
 }
+void Appilcation::renderCompleteTripMenu()const{
+    string header ="Enter trip id:";
+    string readingLabel = "Enter odometer reading:";
+    long tripId;
+    long endReading;
+    system("clear");
+    gotoXY(0,1);
+    cout<<header;
+    gotoXY(0,2);
+    cout<<readingLabel;
+    gotoXY(int(header.length()),1);
+    cin>>tripId;
+    cin.ignore(numeric_limits<streamsize>::max(),'\n');
+    try{
+        auto trip = this->db->getTripRef()->getRecordForId(tripId);
+        Trip * modifiedTrip = new Trip(*trip);
+        auto fare = modifiedTrip->completeTrip(endReading);
+        this->db->updateRecord(modifiedTrip);
+        stringstream ss;
+        ss<<"Total fare:"<<fare;
+        showDialog("Trip completed successfully");
+    }
+    catch(Error e){
+        this->showDialog(e.getMessage());
+    }
+}
+void Application::showDialog(string message, string id)const{
+    auto messageLength=int(message.length());
+    string pressAnyKey="Press any key to continue";
+    int infoLength=int(pressAnyKey.length());
+    int leftOffset=15;
+    int length=50;
+    int lineOffset=9;
+    system("clear");
+    gotoXY(leftOffset,lineOffset++);
+    cout<<"****************************************";
+    gotoXY(leftOffset,lineOffset);
+    cout<<"*";
+    gotoXY(leftOffset+length-1,lineOffset++);
+    cout<<"*";
+    gotoXY(leftOffset,lineOffset);
+    cout<<"*";
+    gotoXY((80-messageLength)/2,lineOffset);
+    cout<<message;
+    gotoXY(leftOffset+length-1,lineOffset++);
+    cout<<"*";
+    if(id!=""){
+        gotoXY(leftOffset,lineOffset);
+        cout<<"*";
+        gotoXY((int)((80-int(id.length()))/2),lineOffset);
+        cout<<id;
+        gotoXY(leftOffset+length-1,lineOffset++);
+        cout<<"*";
+    }
+    gotoXY(leftOffset,lineOffset);
+    cout<<"*";
+    gotoXY((int)((80-infoLength)/2),lineOffset);
+    cout<<pressAnyKey;
+    gotoXY(leftOffset+length-1,lineOffset++);
+    cout<<"*";
+    gotoXY(leftOffset,lineOffset++);
+    cout<<"******************************************";
+    cin.get();
+    }
+    void Appilcation::welcome(){
+        system("clear");
+        gotoXY(25,5);
+        cout<<"Welcome to vehicle renting system"<<endl;
+        gotoXY(27,23);
+        cout<<"Press any key to continue";
+        cin.get();
+        this->renderMenu();
+    }
+    void Appilcation::start(){
+        welcome();
+    }
+    void Appilcation::cleanMemory(){
+        delete db;
+    }
