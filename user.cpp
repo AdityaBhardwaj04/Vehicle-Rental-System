@@ -29,7 +29,7 @@ void User :: display() const{
     cout << "User Details: " << endl;
     cout << "Name: " << this->name << endl;
     cout << "Contact: " << this->contact << endl;
-    cout << "Email: " << this->email << endl;
+    cout << "Email id: " << this->email << endl;
 }
 string User :: toString() const{
     stringstream ss;

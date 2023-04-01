@@ -25,24 +25,24 @@ template <class T> void Database :: addNewRecord(T * record) throw (IOError, Mem
     }
 }
 template <class T> void Database :: updateRecord(T * record) throw (IOError, NoSuchRecordError){
-try{
-    Vehicle * v = dynamic_cast<Vehicle *> (record);
-    if(v){
-        this->vehicleTable->updateRecord(*v);
-        return;
+    try{
+        Vehicle * v = dynamic_cast<Vehicle *> (record);
+        if(v){
+            this->vehicleTable->updateRecord(*v);
+            return;
+        }
+        User * u = dynamic_cast<User *>(record);
+        if(u) {
+            this->userTable->updateRecord(*u);
+            return;
+        }
+        Trip *t = dynamic_cast<Trip *>(record);
+        if(t){
+            this->tripTable->updateRecord(*t);
+            return;
+        }
     }
-    User * u = dynamic_cast<User *>(record);
-    if(u) {
-        this->userTable->updateRecord(*u);
-        return;
+    catch(...){
+        throw;
     }
-    Trip *t = dynamic_cast<Trip *>(record);
-    if(t){
-        this->tripTable->updateRecord(*t);
-        return;
-    }
-}
-catch(...){
-    throw;
-}
 }

@@ -21,7 +21,7 @@ int Vehicle :: getSeats() const{
 string Vehicle :: getCompanyName() const{
     return this->companyName;
 }
-double Vehicle :: getpricePerKm() const{
+double Vehicle :: getPricePerKm() const{
     return this->pricePerKm;
 }
 Date Vehicle :: getPUCExpirationDate() const{
@@ -56,6 +56,7 @@ string Vehicle :: toString() const{
     ss << recordId << DELIMITER
        << registrationNumber << DELIMITER
        << type << DELIMITER
+       << seats << DELIMITER
        << companyName << DELIMITER
        << to_string(pricePerKm) << DELIMITER
        << PUCExpirationDate.toString();

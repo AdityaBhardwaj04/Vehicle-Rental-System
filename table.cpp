@@ -5,14 +5,13 @@ template <class T> Table<T> :: Table ( string filename ) throw( MemoryError ) {
     this->fileName = fileName;
     this->records = new vector<Storable*>();
     if(!this->records){
-        throw MemoryError;
+        throw MemoryError();
     }
 }
 template <class T> long Table<T> :: getNextRecordId() const{
     return this->records->size() + 1;
 }
-template <class T> const T * const Table<T> :: addNewRecord ( T record)
-throw ( MemoryError, IOError ) {
+template <class T> const T * const Table<T> :: addNewRecord ( T record) throw ( MemoryError, IOError ) {
     T * newRecord = new T ( record ) ;
     if ( !newRecord ) {
         throw new MemoryError() ;
@@ -27,16 +26,17 @@ throw ( MemoryError, IOError ) {
         delete newRecord;
         throw;
     }
+    return newRecord;
 }
 template <class T> void Table<T> :: updateRecord ( T updatedRecord ) throw( IOError, NoSuchRecordError ){
-    for ( auto & record : *this- >records ){
-        if ( record->getRecordId ( ) == updatedRecord . getRecordId() ) {
+    for ( auto & record : *this->records ){
+        if ( record->getRecordId ( ) == updatedRecord.getRecordId() ) {
             T * pointerToRecord = dynamic_cast<T*>(record);
             if(pointerToRecord){
                 T oldRecord = T ( *pointerToRecord );
-                record->setDataFrotn ( &updatedRecord );
+                record->setDataFrom ( &updatedRecord );
                 try{
-                    this->writeTofi1e();
+                    this->writeTofile();
                     return;
                 }
                 catch (IOError error){
@@ -76,7 +76,7 @@ template <class T> T * Table<T> :: getReferenceOfRecordForId(long recordId) cons
     throw NoSuchRecordError();
 }
 template <class T> Table<T> :: ~Table(){
-    for(auto & record : *records){
+    for(auto & record : *this->records){
         delete dynamic_cast<T*> (record);
     }
     this->records->clear();

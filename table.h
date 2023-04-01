@@ -10,7 +10,7 @@ template <class T> class Table{
     private:
         string fileName;
         fstream fileStream;
-        vector<StorabIe * > * records = NULL;
+        vector<Storable *> * records = NULL;
         T * getReferenceOfRecordForId ( long recordld ) const throw ( NoSuchRecordError );
         void writeTofile () throw ( IOError );
         const T * const addNewRecord ( T data ) throw ( MemoryError, IOError );

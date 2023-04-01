@@ -1,8 +1,9 @@
-#ifndef vehicle h 
+#ifndef vehicle_h 
 #define vehicle_h
 #include "date.h" 
 #include "storable.cpp"
 #include <string>
+using namespace std;
 typedef enum {bike = 1, car = 2, towera = 3} VehicleType;
 class Vehicle : public Storable {
     private:
@@ -19,7 +20,7 @@ class Vehicle : public Storable {
         string getVehicleTypeName() const;
         int getSeats() const;
         string getCompanyName() const;
-        double getpricePerKm() const;
+        double getPricePerKm() const;
         Date getPUCExpirationDate() const;
         void setPricePerKm(double newPrice);
         void display() const;

@@ -22,7 +22,7 @@ class Application{
         void renderViewTripMenu ( ) const ;
         void renderStartTripMenu ( ) const ;
         void renderCompleteTripMenu ( ) const ;
-        void ShowDialog ( string message, string id = "") const;
+        void showDialog ( string message, string id = "") const;
         void cleanMemory ( ) ;
     public:
         Application();

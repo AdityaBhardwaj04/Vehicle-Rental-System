@@ -1,8 +1,10 @@
 #include "application.h"
 #include "database_templates.cpp"
 #include <iostream>
+#include <iomanip>
 #include <cstdio>
 #include <cstdlib>
+#include <limits>
 Application :: Application(){
     try{
         this->db = new Database();
@@ -62,7 +64,7 @@ void Application :: renderMenu() {
                 this->renderViewTripMenu();
                 break;
             case '6':
-                this->renderViewTripMenu();
+                this->renderAddNewTripMenu();
                 break;
             case '7':
                 this->renderStartTripMenu();
@@ -118,7 +120,7 @@ void Application :: renderAddNewVehicleMenu() const{
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     gotoXY(int(pucExpirationDateLabel.length()),9);
     getline(cin,pucExpirationDate);
-    vehicle * vehicle;
+    Vehicle * vehicle;
     try{
         vehicle = new Vehicle(registrationNo,VehicleType(vehicleType),seat,companyName,price,Date(pucExpirationDate));
         this->db->addNewRecord(vehicle);
@@ -131,7 +133,7 @@ void Application :: renderAddNewVehicleMenu() const{
     }
     delete vehicle;
 }
-void Application::renderviewVehicleMenu()const{
+void Application::renderViewVehicleMenu()const{
     string header="Enter registration no. of vehicle:";
     string registrationNo;
     system("clear");
@@ -158,9 +160,9 @@ void Application::renderEditVehicleMenu()const{
     gotoXY(0,1);
     cout<<header;
     gotoXY(int(header.length()),1);
-    getLine(cin, registrationNo);
+    getline(cin, registrationNo);
     gotoXY(0,3);
-    vehicle * modifiedVehicle;
+    Vehicle * modifiedVehicle;
     try{
         auto vehicle=this->db->getVehicle(registrationNo);
         modifiedVehicle = new Vehicle(*vehicle);
@@ -204,7 +206,7 @@ void Application::renderAddNewUserMenu()const{
     getline(cin,contact);
     gotoXY(int(userEmailLabel.length()),5);
     getline(cin,email);
-    user * user;
+    User * user;
     try{
         user = new User(name,contact,email);
         this->db->addNewRecord(user);
@@ -217,9 +219,9 @@ void Application::renderAddNewUserMenu()const{
         }
         delete user;
 }
-void Application::renderAddNewTripMenu()const{
+void Application::renderAddNewTripMenu() const{
     string header = "Enter details of trip(All fields are required)";
-    string usercontactLabel = "Enter start date of trip{d/m/yyyy)";
+    string startDateLabel = "Enter start date of trip{d/m/yyyy)";
     string endDateLabel = "Enter end date of trip (d/m/yyyy)";
     string vehicleTypeLabel = "Enter vehicle type:";
     string vehicleOptionLabel="(1.Bike, 2.Car, 3.Towera)";
@@ -232,14 +234,14 @@ void Application::renderAddNewTripMenu()const{
     const User*user;
     const Vehicle * vehicle;
     system("clear");
-    gotoXY(0,1).
-    cout<<usercontactLabel;
-    gotoXY(int(usercontactLabel.length()),1);
+    gotoXY(0,1);
+    cout<<startDateLabel;
+    gotoXY(int(startDateLabel.length()),1);
     getline(cin, contactNo);
     try{
         user = this->db->getUser(contactNo);
         gotoXY(0,3);
-        cout<<"USer found:"<<user-getName();
+        cout<<"User found:"<<user->getName();
     }
     catch(Error e){
         this->showDialog(e.getMessage());
@@ -260,15 +262,15 @@ void Application::renderAddNewTripMenu()const{
     getline(cin,endDate);
     gotoXY(int(vehicleTypeLabel.length()),9);
     cin>>vehicleType;
-    cin.ignore(numeric_limits<streansize>::max(),'\n');
-    auto freeVehicles = this->getVehicle(Date(startDate),Date(endDate),VehicleType(vehicleType));
+    cin.ignore(numeric_limits<streamsize>::max(),'\n');
+    auto freeVehicles = this->db->getVehicle(Date(startDate),Date(endDate),VehicleType(vehicleType));
     if(freeVehicles.size()==0){
         this->showDialog("No vehicles are free in given date range");
         return;
     }
     gotoXY(0,12);
     cout<<"|Registration no|"<<"seats|"<<"Price per km|"<<endl;
-    four(auto & vehicle:freeVehicles){
+    for(auto & vehicle:freeVehicles){
         string registrationNo=vehicle->getRegistrationNumber();
         string seats=to_string(vehicle->getSeats());
         stringstream ss;
@@ -276,21 +278,22 @@ void Application::renderAddNewTripMenu()const{
         ss<<std::setprecision(2);
         ss<<vehicle->getPricePerKm();
         string price=ss.str()+"Rs/Km";
-        cout<<"|"<<registrationNo<<string(7,'')<<"|"<<seats<<string(7-seats.length(),'')<<"|"<<price<<string(14-price.length(),'')<<"|"<<endl;
+        cout<<"|"<<registrationNo<<string(7,' ')<<"|"<<seats<<string(7-seats.length(),' ')<<"|"<<price<<string(14-price.length(),' ')<<"|"<<endl;
     }
-    int offset=int(freeVehicles.size()+2);
+    int offset=int(freeVehicles.size())+2;
     gotoXY(0,12+offset);
     cout<<registrationNoLabel;
     gotoXY(int(registrationNoLabel.length()),12+offset);
     getline(cin,registrationNo);
     try{
-    vehicle->this->db->getVehicle(registrationNo);
+        vehicle = this->db->getVehicle(registrationNo);
     }
     catch(Error e){
         this->showDialog(e.getMessage());
         return;
     }
     long userId=user->getRecordId();
+    long vehicleId = vehicle->getRecordId();
     Trip*trip;
     try{
         trip = new Trip(this->db->getVehicleRef()->getRecordForId(vehicleId),this->db->getUserRef()->getRecordForId(userId),Date(startDate),Date(endDate));
@@ -304,7 +307,7 @@ void Application::renderAddNewTripMenu()const{
     }
     delete trip;
 }
-void Appilcation::renderViewTripMenu()const{
+void Application :: renderViewTripMenu()const{
     string header="Enter trip id:";
     long tripId;
     system("clear");
@@ -321,9 +324,41 @@ void Appilcation::renderViewTripMenu()const{
     catch(Error e){
         this->showDialog(e.getMessage());
     }
+}
+void Application :: renderStartTripMenu()const{
+    string header="Enter trip id:";
+    string readingLabel = "Enter odometer reading: ";
+    long tripId;
+    long startReading;
+    system("clear");
+    gotoXY(0,1);
+    cout << header;
+    gotoXY(0,2);
+    cout << readingLabel;
+
+    gotoXY(int(header.length()), 1);
+    cin >> tripId;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    gotoXY(int(readingLabel.length()), 2);
+    cin >> startReading;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    Trip * modifiedTrip;
+
+    try{
+        auto trip = this->db->getTripRef()->getRecordForId(tripId);
+        modifiedTrip = new Trip(*trip);
+        modifiedTrip->startTrip(startReading);
+        this->db->updateRecord(modifiedTrip);
+        showDialog("Trip started successfully!");
+    }
+    catch(Error e){
+        this->showDialog(e.getMessage());
+    }
     delete modifiedTrip;
 }
-void Appilcation::renderCompleteTripMenu()const{
+void Application::renderCompleteTripMenu()const{
     string header ="Enter trip id:";
     string readingLabel = "Enter odometer reading:";
     long tripId;
@@ -336,6 +371,11 @@ void Appilcation::renderCompleteTripMenu()const{
     gotoXY(int(header.length()),1);
     cin>>tripId;
     cin.ignore(numeric_limits<streamsize>::max(),'\n');
+
+    gotoXY(int(readingLabel.length()), 2);
+    cout << endReading;
+    cin.ignore(numeric_limits<streamsize>::max(),'\n');
+
     try{
         auto trip = this->db->getTripRef()->getRecordForId(tripId);
         Trip * modifiedTrip = new Trip(*trip);
@@ -387,7 +427,7 @@ void Application::showDialog(string message, string id)const{
     cout<<"******************************************";
     cin.get();
     }
-    void Appilcation::welcome(){
+    void Application::welcome(){
         system("clear");
         gotoXY(25,5);
         cout<<"Welcome to vehicle renting system"<<endl;
@@ -396,9 +436,9 @@ void Application::showDialog(string message, string id)const{
         cin.get();
         this->renderMenu();
     }
-    void Appilcation::start(){
+    void Application::start(){
         welcome();
     }
-    void Appilcation::cleanMemory(){
+    void Application::cleanMemory(){
         delete db;
     }

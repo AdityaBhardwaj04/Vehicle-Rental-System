@@ -45,7 +45,7 @@ double Trip::completeTrip ( long endReading ) {
         return this->fare;
     }
     this->endReading = endReading ;
-    this->fare = (this->endReading - this->startReading) * this->vehicle->getpricePerKm();
+    this->fare = (this->endReading - this->startReading) * this->vehicle->getPricePerKm();
     this->completed=true ;
     return this->fare;
 }
@@ -54,7 +54,7 @@ void Trip :: display() const{
     cout << "Registration no: " << this->vehicle->getRegistrationNumber() << endl;
     cout << "Vehicle type : " << this->vehicle->getVehicleTypeName() << endl;
     cout << "Company name: " << this->vehicle->getCompanyName() << endl;
-    cout << "Price per km: " << this->vehicle->getpricePerKm() << "Rs/Km" << endl;
+    cout << "Price per km: " << this->vehicle->getPricePerKm() << "Rs/Km" << endl;
     cout << endl;
     cout << "User Details: " << endl;
     cout << "Name: " << this->user->getName() << endl;

@@ -23,7 +23,7 @@ class Database{
         const Table<Trip> * const getTripRef() const;
         const Vehicle * const getVehicle(string registrationNo) const throw (NoSuchRecordError) ;
         const User * const getUser (string contactNo) const throw (NoSuchRecordError);
-        const vector<const Vehicle *>getVehicle(Date startDate, Date endDate, VehicleType type) const;
+        const vector<const Vehicle *> getVehicle(Date startDate, Date endDate, VehicleType type) const;
         template <class T> void addNewRecord (T * record) throw (IOError, MemoryError);
         template <class T> void updateRecord (T * record) throw (IOError, NoSuchRecordError);
 };
